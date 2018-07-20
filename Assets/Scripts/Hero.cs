@@ -12,6 +12,11 @@ public class Hero : MonoBehaviour {
     private Text MP;
     private Vector3 v3MatrixPosition;
     public bool bLastInputX = false;
+    private Vector3 v3FacingDirection = Vector3.forward;
+
+    private const float DELAY_BETWEEN_INPUTS = .5f;
+    private const float SWAP_COOLDOWN = .5f;
+    private float fLastTimeMovement = 0, fLastTimeSwap = 0;
     // Use this for initialization
     void Start () {
         terrainGen = GameObject.FindGameObjectWithTag(BSConstants.TAG_GAME_CONTROLLER).GetComponent<TerrainGen>();
@@ -26,56 +31,73 @@ public class Hero : MonoBehaviour {
 
     private void InputController()
     {
-        if (terrainGen.FinishedRotatingTiles() && iMana > BSConstants.SPELL_COST)
+        if (iMana > BSConstants.SPELL_COST)
         {
-            if (Input.GetKeyUp("up"))
+
+            if (Time.realtimeSinceStartup >= fLastTimeSwap + SWAP_COOLDOWN)
             {
-                MoveTerrain(BSEnums.SwipeDirection.UP);
+                if (Input.GetButtonDown("Fire1"))
+                {
+                    fLastTimeSwap = Time.realtimeSinceStartup;
+                    SwapTile();
+                }
             }
 
-            if (Input.GetKeyUp("down"))
+
+            if (Time.realtimeSinceStartup >= fLastTimeMovement + DELAY_BETWEEN_INPUTS)
             {
-                MoveTerrain(BSEnums.SwipeDirection.DOWN);
-            }
-
-            if (Input.GetKeyUp("right"))
-            {
-                MoveTerrain(BSEnums.SwipeDirection.RIGHT);
-                bLastInputX = true;
-            }
-            if (Input.GetKeyUp("left"))
-            {
-                MoveTerrain(BSEnums.SwipeDirection.LEFT);
-            }
-
-            if (Input.GetKeyUp(KeyCode.W))
-            {
-                transform.position += Vector3.forward;
-                v3MatrixPosition += Vector3.forward;
-            }
-
-            if (Input.GetKeyUp(KeyCode.D))
-            {
-                transform.position += Vector3.right;
-                v3MatrixPosition += Vector3.right;
-
-            }
-
-            if (Input.GetKeyUp(KeyCode.A))
-            {
-                transform.position += Vector3.left;
-                v3MatrixPosition += Vector3.left;
-
-
-            }
-            if (Input.GetKeyUp(KeyCode.S))
-            {
-                transform.position += Vector3.back;
-                v3MatrixPosition += Vector3.back;
-
+                if (Input.GetAxisRaw("Vertical") > 0)
+                {
+                    transform.position += Vector3.forward;
+                    v3MatrixPosition += Vector3.forward;
+                    fLastTimeMovement = Time.realtimeSinceStartup;
+                    v3FacingDirection = Vector3.forward;
+                }
+                else if (Input.GetAxisRaw("Vertical") < 0)
+                {
+                    transform.position += Vector3.back;
+                    v3MatrixPosition += Vector3.back;
+                    fLastTimeMovement = Time.realtimeSinceStartup;
+                    v3FacingDirection = Vector3.back;
+                }
+                else if (Input.GetAxisRaw("Horizontal") > 0)
+                {
+                    transform.position += Vector3.right;
+                    v3MatrixPosition += Vector3.right;
+                    fLastTimeMovement = Time.realtimeSinceStartup;
+                    v3FacingDirection = Vector3.right;
+                }
+                else if (Input.GetAxisRaw("Horizontal") < 0)
+                {
+                    transform.position += Vector3.left;
+                    v3MatrixPosition += Vector3.left;
+                    fLastTimeMovement = Time.realtimeSinceStartup;
+                    v3FacingDirection = Vector3.left;
+                }
+                transform.SetParent(terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().goTopTile.transform);
             }
         }
     }
+
+    public void SwapTile()
+    {
+        BSEnums.SwipeDirection swipeDir = BSEnums.SwipeDirection.BACK;
+        if (v3FacingDirection == Vector3.forward)
+        {
+            swipeDir = BSEnums.SwipeDirection.FORWARD;
+        }
+        else if(v3FacingDirection == Vector3.right)
+        {
+            swipeDir = BSEnums.SwipeDirection.RIGHT;
+        }
+        else if (v3FacingDirection == Vector3.left)
+        {
+            swipeDir = BSEnums.SwipeDirection.LEFT;
+        }
+        terrainGen.GetTile(v3MatrixPosition + v3FacingDirection).GetComponentInChildren<Tile>().GetNextMovement(swipeDir);
+
+    }
+
 
     public void MoveTerrain(BSEnums.SwipeDirection swipe)
     {
@@ -88,8 +110,8 @@ public class Hero : MonoBehaviour {
 
             }
         }
-        else if (swipe == BSEnums.SwipeDirection.DOWN
-                || swipe == BSEnums.SwipeDirection.UP)
+        else if (swipe == BSEnums.SwipeDirection.BACK
+                || swipe == BSEnums.SwipeDirection.FORWARD)
         {
             for (int i = 0; i < BSConstants.Z_SIZE; i++)
             {
@@ -102,10 +124,10 @@ public class Hero : MonoBehaviour {
     {
         switch (swipe)
         {
-            case BSEnums.SwipeDirection.UP:
+            case BSEnums.SwipeDirection.FORWARD:
                 ChangeEnemyZPos(true);
                 break;
-            case BSEnums.SwipeDirection.DOWN:
+            case BSEnums.SwipeDirection.BACK:
                 ChangeEnemyZPos(false);
                 break;
             case BSEnums.SwipeDirection.RIGHT:
@@ -135,12 +157,8 @@ public class Hero : MonoBehaviour {
 
     void OnCollisionEnter(Collision collision)
     {
-        //Debug.Log("OnCollisionEnter(): " + collision.gameObject.tag);
         if (collision.gameObject.tag.Equals(BSConstants.TAG_TILE))
         {
-           // Debug.Log("OnCollisionEnter(): " + BSConstants.TAG_TILE);
-
-            //collision.gameObject.GetComponentInParent<Tile>().SetTileType(BSEnums.TileType.FIXED);
         }
     }
 }

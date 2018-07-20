@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2017
+# Visual Studio 2015
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RogueBlock", "RogueBlock.csproj", "{6CFD98E0-98CB-63CE-9E74-9BBA3990D4FA}"
 EndProject
 Global

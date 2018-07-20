@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Tile : MonoBehaviour {
-
+    public GameObject goTopTile, goBotTile;
     private BSEnums.TileType tileType = BSEnums.TileType.ROTATING;
     private BSEnums.TileType prevTileType = BSEnums.TileType.ROTATING;
     private Quaternion targetRotation = Quaternion.Euler(Vector3.zero);
@@ -119,10 +119,10 @@ public class Tile : MonoBehaviour {
             {
                 switch (swipe)
                 {
-                    case BSEnums.SwipeDirection.UP:
+                    case BSEnums.SwipeDirection.FORWARD:
                         nextSpinVector = TurnUp(tile);
                         break;
-                    case BSEnums.SwipeDirection.DOWN:
+                    case BSEnums.SwipeDirection.BACK:
                         nextSpinVector = -TurnUp(tile);
                         break;
                     case BSEnums.SwipeDirection.RIGHT:
@@ -137,10 +137,10 @@ public class Tile : MonoBehaviour {
             {
                 switch (swipe)
                 {
-                    case BSEnums.SwipeDirection.UP:
+                    case BSEnums.SwipeDirection.FORWARD:
                         nextSpinVector = -TurnUp(tile);
                         break;
-                    case BSEnums.SwipeDirection.DOWN:
+                    case BSEnums.SwipeDirection.BACK:
                         nextSpinVector = TurnUp(tile);
                         break;
                     case BSEnums.SwipeDirection.RIGHT:
@@ -155,7 +155,7 @@ public class Tile : MonoBehaviour {
             if (tileType == BSEnums.TileType.ROTATING
                 || tileType == BSEnums.TileType.INVERSE_ROTATING)
             {
-                SetTargetRotation(GetTargetRotation() * Quaternion.AngleAxis(90f, nextSpinVector));
+                SetTargetRotation(GetTargetRotation() * Quaternion.AngleAxis(179.9f, nextSpinVector));
             }
             bFinishedRotating = false;
         }
