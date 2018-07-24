@@ -151,6 +151,10 @@ public class Tile : MonoBehaviour {
                         break;
                 }
             }
+            if(GetComponentInChildren<Enemy>() != null)
+            {
+                GetComponentInChildren<Enemy>().bOnTop = !GetComponentInChildren<Enemy>().bOnTop;
+            }
             //pregunta al script y no a la matriz por si un enemigo la cambio
             if (tileType == BSEnums.TileType.ROTATING
                 || tileType == BSEnums.TileType.INVERSE_ROTATING)

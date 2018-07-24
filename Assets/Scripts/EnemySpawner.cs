@@ -69,7 +69,7 @@ public class EnemySpawner : MonoBehaviour {
     {
         int iRandTile = GetRandomTile();
         Vector3 v3 = GetRandomSpawnPoint(iRandTile);
-        RepositionGameObject(GetDisabledEnemy(), v3, iRandTile);
+        //RepositionGameObject(GetDisabledEnemy(), v3, iRandTile);
         binstantiating = false;
     }
 
@@ -87,24 +87,7 @@ public class EnemySpawner : MonoBehaviour {
         }
     }
 
-    private int GetDisabledEnemy()
-    {
-        bool bFoundDisabledEnemy = false;
-        int i = -1;
-        while(i < enemies.Length - 1 && !bFoundDisabledEnemy)
-        {
-            i++;
-            if (enemies[i].GetComponent<Enemy>().IsDisabled())
-            {
-                bFoundDisabledEnemy = true;
-            }
-        }
-        return i;
-    }
 
-    private void RepositionGameObject(int iEnemyIndex, Vector3 position, int tile)
-    {
-        enemies[iEnemyIndex].GetComponent<Enemy>().Reset(position);
-        enemies[iEnemyIndex].GetComponent<Enemy>().SetFromTileVelocity(tile);
-    }
+
+
 }

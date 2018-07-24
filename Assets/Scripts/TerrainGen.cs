@@ -150,7 +150,7 @@ public class TerrainGen : MonoBehaviour {
 
     public GameObject GetTile(Vector3 v3HeroPosition)
     {
-        Debug.Log("GetTile on position: " +v3HeroPosition);
+        //Debug.Log("GetTile on position: " +v3HeroPosition);
         return goMatrixTerrain[(int)v3HeroPosition.x, (int)v3HeroPosition.y, (int)v3HeroPosition.z];
     }
 }

@@ -15,7 +15,7 @@ public static class BSConstants {
     public const string TAG_TILE = "Tile";
     public const string TAG_GAME_CONTROLLER = "GameController";
     public const string TAG_CANVAS = "CANVAS";
-    public const string TAG_HERO = "HERO";
+    public const string TAG_HERO = "Player";
     public const int ENEMY_POOL_SIZE = 20;
     public const int SPELL_COST = 20;
     public const int MAX_MANA = 100;
@@ -35,6 +35,6 @@ public static class BSConstants {
 
     public static readonly UnityEngine.Vector3 OBJECT_OUT_OF_SCREEN = new UnityEngine.Vector3(500, 500, 500);
 
-    public const float ROTATION_SPEED = .1f;
+    public const float ROTATION_SPEED = .2f;
 
 }

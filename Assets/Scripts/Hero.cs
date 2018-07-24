@@ -18,7 +18,8 @@ public class Hero : MonoBehaviour {
     private const float SWAP_COOLDOWN = .5f;
     private float fLastTimeMovement = 0, fLastTimeSwap = 0;
     // Use this for initialization
-    void Start () {
+    void Start ()
+    {
         terrainGen = GameObject.FindGameObjectWithTag(BSConstants.TAG_GAME_CONTROLLER).GetComponent<TerrainGen>();
         v3MatrixPosition = transform.position = Vector3.zero;
     }
@@ -48,36 +49,41 @@ public class Hero : MonoBehaviour {
             {
                 if (Input.GetAxisRaw("Vertical") > 0)
                 {
-                    transform.position += Vector3.forward;
-                    v3MatrixPosition += Vector3.forward;
-                    fLastTimeMovement = Time.realtimeSinceStartup;
-                    v3FacingDirection = Vector3.forward;
+                    MoveInDirection(Vector3.forward);
                 }
                 else if (Input.GetAxisRaw("Vertical") < 0)
                 {
-                    transform.position += Vector3.back;
-                    v3MatrixPosition += Vector3.back;
-                    fLastTimeMovement = Time.realtimeSinceStartup;
-                    v3FacingDirection = Vector3.back;
+                    MoveInDirection(Vector3.back);
+
                 }
                 else if (Input.GetAxisRaw("Horizontal") > 0)
                 {
-                    transform.position += Vector3.right;
-                    v3MatrixPosition += Vector3.right;
-                    fLastTimeMovement = Time.realtimeSinceStartup;
-                    v3FacingDirection = Vector3.right;
+                    MoveInDirection(Vector3.right);
+
                 }
                 else if (Input.GetAxisRaw("Horizontal") < 0)
                 {
-                    transform.position += Vector3.left;
-                    v3MatrixPosition += Vector3.left;
-                    fLastTimeMovement = Time.realtimeSinceStartup;
-                    v3FacingDirection = Vector3.left;
+                    MoveInDirection(Vector3.left);
                 }
-                transform.SetParent(terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().goTopTile.transform);
+                //transform.SetParent(terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().goTopTile.transform);
             }
         }
     }
+
+    public void MoveInDirection(Vector3 v3MoveKey)
+    {
+        transform.SetParent(null);
+        if (v3FacingDirection == v3MoveKey)
+        {
+            transform.position += v3MoveKey;
+            v3MatrixPosition += v3MoveKey;
+        }
+        else
+        {
+            v3FacingDirection = v3MoveKey;
+        }
+        fLastTimeMovement = Time.realtimeSinceStartup;
+    } 
 
     public void SwapTile()
     {
@@ -98,7 +104,7 @@ public class Hero : MonoBehaviour {
 
     }
 
-
+    /*
     public void MoveTerrain(BSEnums.SwipeDirection swipe)
     {
         if (swipe == BSEnums.SwipeDirection.RIGHT
@@ -118,47 +124,13 @@ public class Hero : MonoBehaviour {
                 terrainGen.GetTile(new Vector3(v3MatrixPosition.x, v3MatrixPosition.y, i)).GetComponentInChildren<Tile>().GetNextMovement(swipe);
             }
         }
-    }
-
-    private void ChangeEnemyPos(BSEnums.SwipeDirection swipe)
-    {
-        switch (swipe)
-        {
-            case BSEnums.SwipeDirection.FORWARD:
-                ChangeEnemyZPos(true);
-                break;
-            case BSEnums.SwipeDirection.BACK:
-                ChangeEnemyZPos(false);
-                break;
-            case BSEnums.SwipeDirection.RIGHT:
-                ChangeEnemyXPos(true);
-                break;
-            case BSEnums.SwipeDirection.LEFT:
-                ChangeEnemyXPos(false);
-                break;
-        }
-
-    }
-
-    public void ChangeEnemyXPos(bool bPositive)
-    {
-        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag(BSConstants.TAG_ENEMY))
-        {
-            enemy.GetComponent<Enemy>().ChangePositionX(bPositive);
-        }
-    }
-    public void ChangeEnemyZPos(bool bPositive)
-    {
-        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag(BSConstants.TAG_ENEMY))
-        {
-            enemy.GetComponent<Enemy>().ChangePositionZ(bPositive);
-        }
-    }
+    }*/
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag.Equals(BSConstants.TAG_TILE))
+        if (collision.gameObject.tag.Equals(BSConstants.TAG_ENEMY))
         {
+            Destroy(this);
         }
     }
 }
