@@ -17,20 +17,30 @@ public class Enemy : MonoBehaviour {
         hero = GameObject.FindGameObjectWithTag(BSConstants.TAG_HERO).GetComponent<Hero>();
         terrainGen = GameObject.FindGameObjectWithTag(BSConstants.TAG_GAME_CONTROLLER).GetComponent<TerrainGen>();
         v3MatrixPosition = this.transform.position = new Vector3(Random.Range(0,BSConstants.X_SIZE), 0, Random.Range(0, BSConstants.Z_SIZE));
-        this.transform.position += Vector3.up;
+        transform.position = new Vector3(transform.position.x, BSConstants.POSITION_OVER_SCENARIO_Y, transform.position.z);
+
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update ()
     {
 
-        if (bOnTop && Time.realtimeSinceStartup >= fLastTimeMovement + DELAY_BETWEEN_INPUTS)
+        if (bOnTop == hero.bOnTop  
+            && Time.realtimeSinceStartup >= fLastTimeMovement + DELAY_BETWEEN_INPUTS 
+            && terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().bFinishedRotating)
         {
             fLastTimeMovement = Time.realtimeSinceStartup;
             Vector3 v3Nextstep = GetNextStep();
             transform.position += v3Nextstep;
             v3MatrixPosition += v3Nextstep;
-            transform.SetParent(terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().goTopTile.transform);
+            if (bOnTop)
+            {
+                transform.SetParent(terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().goTopTile.transform);
+            }
+            else
+            {
+                transform.SetParent(terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().goBotTile.transform);
+            }
 
         }
     }

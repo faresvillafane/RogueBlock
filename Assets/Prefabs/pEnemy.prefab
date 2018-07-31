@@ -25,7 +25,7 @@ GameObject:
   - component: {fileID: 114085672920791070}
   m_Layer: 0
   m_Name: pEnemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -93,7 +93,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b76dc3d66024fba4cb58f741274a6be7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  materials: []
+  bOnTop: 1
 --- !u!135 &135956269765056454
 SphereCollider:
   m_ObjectHideFlags: 1

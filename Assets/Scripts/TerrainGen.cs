@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class TerrainGen : MonoBehaviour {
-    public GameObject prefabTile;
+    public GameObject prefabTile, prefabTileFixed;
     public GameObject goTerrainHolder;
 
     //Stores the gameobjects
@@ -22,7 +22,9 @@ public class TerrainGen : MonoBehaviour {
     private Hero hero;
     private bool bFinishedRotating = true;
 
-    void Start ()
+    public Vector3 v3EntrancePosition, v3ExitPosition;
+
+    void Awake ()
     {
         Debug.Log("Start()");
 
@@ -58,32 +60,37 @@ public class TerrainGen : MonoBehaviour {
     {
         Debug.Log("FillMatrixRectangle()");
 
-        Vector2[] vTraps = new Vector2[iNumberOfTraps];
+        /*Vector2[] vTraps = new Vector2[iNumberOfTraps];
         bool bTrap = false;
         for(int i = 0; i < iNumberOfTraps; i++)
         {
             vTraps[i] = new Vector2(Random.Range(iXStart, iXStart + X), Random.Range(iZStart, iZStart + Z));
-        }
+        }*/
         for (int x = iXStart; x < (iXStart + X) && x < iMatrixTerrain.GetLength(0); x++)
         {
             for (int z = iZStart; z < (iZStart + Z) && z < iMatrixTerrain.GetLength(2); z++)
             {
-                for (int i = 0; i < iNumberOfTraps; i++)
+          /*      for (int i = 0; i < iNumberOfTraps; i++)
                 {
                     if(vTraps[i].x == x && vTraps[i].y == z)
                     {
                         bTrap = true;
                     }
-                }
-                iMatrixTerrain[x, BSConstants.Y_SIZE - 1, z] = (bTrap)?(int) BSEnums.TileType.TRAP : (int)tile;
+                }*/
+                iMatrixTerrain[x, BSConstants.Y_SIZE - 1, z] = (int)tile;
                 for(int y = 0; y < BSConstants.Y_SIZE - 1; y++)
                 {
-                    iMatrixTerrain[x, y, z] = (bTrap) ? (int)BSEnums.TileType.TRAP : (int)BSEnums.TileType.FIXED;
+                    iMatrixTerrain[x, y, z] = (int)BSEnums.TileType.FIXED;
 
                 }
-                bTrap = false;
             }
         }
+        //Place Entrance
+        iMatrixTerrain[0, 0, Random.Range(0, BSConstants.Z_SIZE - 1)] = (int)BSEnums.TileType.ENTRANCE;
+
+        //Place Exit
+        iMatrixTerrain[BSConstants.X_SIZE-1, 0, Random.Range(0, BSConstants.Z_SIZE - 1)] = (int)BSEnums.TileType.EXIT;
+
     }
 
     private void FillIntMatrixShape()
@@ -118,6 +125,18 @@ public class TerrainGen : MonoBehaviour {
                     else if (iMatrixTerrain[x, y, z] == (int)BSEnums.TileType.FIXED)
                     {
                         Instantiate(prefabTile, new Vector3(x, y - BSConstants.Y_SIZE, z), prefabTile.transform.rotation);
+                    }
+                    else if (iMatrixTerrain[x, y, z] == (int)BSEnums.TileType.ENTRANCE || iMatrixTerrain[x, y, z] == (int)BSEnums.TileType.EXIT)
+                    {
+                        goMatrixTerrain[x, y, z] = Instantiate(prefabTileFixed, new Vector3(x, y - BSConstants.Y_SIZE, z), prefabTile.transform.rotation);
+                        if (iMatrixTerrain[x, y, z] == (int)BSEnums.TileType.ENTRANCE)
+                        {
+                            v3EntrancePosition = new Vector3(x, y, z);
+                        }
+                        else
+                        {
+                            v3ExitPosition = new Vector3(x, y, z);
+                        }
                     }
                 }
             }

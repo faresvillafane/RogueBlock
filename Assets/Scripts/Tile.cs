@@ -11,7 +11,7 @@ public class Tile : MonoBehaviour {
 
     private Material initMaterial;
 
-    private bool bFinishedRotating = true;
+    public bool bFinishedRotating = true;
 
     private Vector3 v3PositionInMatrix;
 
@@ -160,8 +160,8 @@ public class Tile : MonoBehaviour {
                 || tileType == BSEnums.TileType.INVERSE_ROTATING)
             {
                 SetTargetRotation(GetTargetRotation() * Quaternion.AngleAxis(179.9f, nextSpinVector));
+                bFinishedRotating = false;
             }
-            bFinishedRotating = false;
         }
 
     }

@@ -3,13 +3,13 @@
 public static class BSConstants {
     public const int CENTER_DIM = 3;
 
-    public const int X_SIZE = 10;
-    public const int Z_SIZE = 10;
+    public const int X_SIZE = 30;
+    public const int Z_SIZE = 30;
     public const int Y_SIZE = 1;
 
     public const int ENEMY_Y_SPAWN = 0;
     public const string TAG_TRAP = "TRAP";
-    public const string TAG_ENEMY = "ENEMY";
+    public const string TAG_ENEMY = "Enemy";
     public const string TAG_WATER = "WATER";
     public const string TAG_CENTER_TILE = "CENTER_TILE";
     public const string TAG_TILE = "Tile";
@@ -36,5 +36,6 @@ public static class BSConstants {
     public static readonly UnityEngine.Vector3 OBJECT_OUT_OF_SCREEN = new UnityEngine.Vector3(500, 500, 500);
 
     public const float ROTATION_SPEED = .2f;
+    public const float POSITION_OVER_SCENARIO_Y = -.4f;
 
 }

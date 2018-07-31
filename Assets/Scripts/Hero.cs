@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Hero : MonoBehaviour {
@@ -14,14 +15,18 @@ public class Hero : MonoBehaviour {
     public bool bLastInputX = false;
     private Vector3 v3FacingDirection = Vector3.forward;
 
-    private const float DELAY_BETWEEN_INPUTS = .5f;
+    private const float DELAY_BETWEEN_INPUTS = .25f;
     private const float SWAP_COOLDOWN = .5f;
     private float fLastTimeMovement = 0, fLastTimeSwap = 0;
+
+    public bool bOnTop = true;
     // Use this for initialization
     void Start ()
     {
         terrainGen = GameObject.FindGameObjectWithTag(BSConstants.TAG_GAME_CONTROLLER).GetComponent<TerrainGen>();
-        v3MatrixPosition = transform.position = Vector3.zero;
+        v3MatrixPosition = transform.position = terrainGen.v3EntrancePosition;
+
+        transform.position = new Vector3(transform.position.x, BSConstants.POSITION_OVER_SCENARIO_Y, transform.position.z);
     }
 	
 	// Update is called once per frame
@@ -32,6 +37,11 @@ public class Hero : MonoBehaviour {
 
     private void InputController()
     {
+        if (v3MatrixPosition == terrainGen.v3ExitPosition)
+        {
+            SceneManager.LoadScene("Main");
+        }
+
         if (iMana > BSConstants.SPELL_COST)
         {
 
@@ -45,7 +55,7 @@ public class Hero : MonoBehaviour {
             }
 
 
-            if (Time.realtimeSinceStartup >= fLastTimeMovement + DELAY_BETWEEN_INPUTS)
+            if (Time.realtimeSinceStartup >= fLastTimeMovement + DELAY_BETWEEN_INPUTS /*&& terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().bFinishedRotating*/)
             {
                 if (Input.GetAxisRaw("Vertical") > 0)
                 {
@@ -65,7 +75,7 @@ public class Hero : MonoBehaviour {
                 {
                     MoveInDirection(Vector3.left);
                 }
-                //transform.SetParent(terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().goTopTile.transform);
+                transform.SetParent(terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().goTopTile.transform);
             }
         }
     }
@@ -73,7 +83,7 @@ public class Hero : MonoBehaviour {
     public void MoveInDirection(Vector3 v3MoveKey)
     {
         transform.SetParent(null);
-        if (v3FacingDirection == v3MoveKey)
+        if (v3FacingDirection == v3MoveKey && terrainGen.GetTile(v3MatrixPosition + v3MoveKey).GetComponentInChildren<Tile>().bFinishedRotating)
         {
             transform.position += v3MoveKey;
             v3MatrixPosition += v3MoveKey;
@@ -126,11 +136,11 @@ public class Hero : MonoBehaviour {
         }
     }*/
 
-    void OnCollisionEnter(Collision collision)
+    void OnTriggerEnter(Collider col)
     {
-        if (collision.gameObject.tag.Equals(BSConstants.TAG_ENEMY))
+        if (col.gameObject.tag.Equals(BSConstants.TAG_ENEMY))
         {
-            Destroy(this);
+            SceneManager.LoadScene("Main");
         }
     }
 }
