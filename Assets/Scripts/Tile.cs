@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour {
     public GameObject goTopTile, goBotTile;
-    private BSEnums.TileType tileType = BSEnums.TileType.ROTATING;
+    private BSEnums.TileType tileTopType = BSEnums.TileType.ROTATING;
+    private BSEnums.TileType tileBotType = BSEnums.TileType.ROTATING;
     private BSEnums.TileType prevTileType = BSEnums.TileType.ROTATING;
     private Quaternion targetRotation = Quaternion.Euler(Vector3.zero);
     private float fRotatingSpeed;
@@ -47,18 +48,18 @@ public class Tile : MonoBehaviour {
 
     public BSEnums.TileType GetTileType()
     {
-        return tileType;
+        return tileTopType;
     }
 
     public void SetTileType(BSEnums.TileType tt)
     {
-        tileType = tt;
+        tileTopType = tt;
         //StartCoroutine(RecoverTileType());
     }
 
     public void SetTileType(BSEnums.TileType tt, Material newMat)
     {
-        tileType = tt;
+        tileTopType = tt;
         this.GetComponent<Renderer>().sharedMaterial = newMat;
         StartCoroutine(RecoverTileType());
     }
@@ -66,7 +67,7 @@ public class Tile : MonoBehaviour {
     private IEnumerator RecoverTileType()
     {
         yield return new WaitForSeconds(BSConstants.RECOVER_TIME_TILE);
-        tileType = BSEnums.TileType.ROTATING;
+        tileTopType = BSEnums.TileType.ROTATING;
         this.GetComponent<Renderer>().sharedMaterial = initMaterial;
 
     }
@@ -83,7 +84,7 @@ public class Tile : MonoBehaviour {
         {
             bFinishedRotating = true;
 
-            if (this.tileType == BSEnums.TileType.ROTATING)
+            if (this.tileTopType == BSEnums.TileType.ROTATING)
             {
                 bFinishedRotating &= RotateTile();
             }
@@ -111,53 +112,37 @@ public class Tile : MonoBehaviour {
 
     public void GetNextMovement(BSEnums.SwipeDirection swipe)
     {
-        if (tileType == BSEnums.TileType.ROTATING)
+        if (tileTopType != BSEnums.TileType.FIXED)
         {
             Transform tile = this.transform;
             Vector3 nextSpinVector = Vector3.zero;
-            if (tileType == BSEnums.TileType.ROTATING)
+            switch (swipe)
             {
-                switch (swipe)
-                {
-                    case BSEnums.SwipeDirection.FORWARD:
-                        nextSpinVector = TurnUp(tile);
-                        break;
-                    case BSEnums.SwipeDirection.BACK:
-                        nextSpinVector = -TurnUp(tile);
-                        break;
-                    case BSEnums.SwipeDirection.RIGHT:
-                        nextSpinVector = TurnRight(tile);
-                        break;
-                    case BSEnums.SwipeDirection.LEFT:
-                        nextSpinVector = -TurnRight(tile);
-                        break;
-                }
-            }
-            else
-            {
-                switch (swipe)
-                {
-                    case BSEnums.SwipeDirection.FORWARD:
-                        nextSpinVector = -TurnUp(tile);
-                        break;
-                    case BSEnums.SwipeDirection.BACK:
-                        nextSpinVector = TurnUp(tile);
-                        break;
-                    case BSEnums.SwipeDirection.RIGHT:
-                        nextSpinVector = -TurnRight(tile);
-                        break;
-                    case BSEnums.SwipeDirection.LEFT:
-                        nextSpinVector = TurnRight(tile);
-                        break;
-                }
+                case BSEnums.SwipeDirection.FORWARD:
+                    nextSpinVector = TurnUp(tile);
+                    break;
+                case BSEnums.SwipeDirection.BACK:
+                    nextSpinVector = -TurnUp(tile);
+                    break;
+                case BSEnums.SwipeDirection.RIGHT:
+                    nextSpinVector = TurnRight(tile);
+                    break;
+                case BSEnums.SwipeDirection.LEFT:
+                    nextSpinVector = -TurnRight(tile);
+                    break;
             }
             if(GetComponentInChildren<Enemy>() != null)
             {
                 GetComponentInChildren<Enemy>().bOnTop = !GetComponentInChildren<Enemy>().bOnTop;
             }
+
+            if (GetComponentInChildren<Hero>() != null)
+            {
+                GetComponentInChildren<Hero>().bOnTop = !GetComponentInChildren<Hero>().bOnTop;
+            }
             //pregunta al script y no a la matriz por si un enemigo la cambio
-            if (tileType == BSEnums.TileType.ROTATING
-                || tileType == BSEnums.TileType.INVERSE_ROTATING)
+            if (tileTopType == BSEnums.TileType.ROTATING
+                /*|| tileType == BSEnums.TileType.INVERSE_ROTATING*/)
             {
                 SetTargetRotation(GetTargetRotation() * Quaternion.AngleAxis(179.9f, nextSpinVector));
                 bFinishedRotating = false;

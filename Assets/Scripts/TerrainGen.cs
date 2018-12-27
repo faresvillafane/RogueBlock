@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.IO;
 
 public class TerrainGen : MonoBehaviour {
-    public GameObject prefabTile, prefabTileFixed;
+    public GameObject prefabTile, prefabEntrance;
     public GameObject goTerrainHolder;
 
     //Stores the gameobjects
@@ -56,7 +57,7 @@ public class TerrainGen : MonoBehaviour {
             }
         }
     }
-    private void FillMatrixRectangle(int iXStart, int iZStart, int X, int Z, BSEnums.TileType tile, int iNumberOfTraps = BSConstants.NUMBER_OF_TRAPS_PER_RECTANGLE)
+    private void FillMatrixRectangle(int iXStart, int iZStart, int XSize, int ZSize, BSEnums.TileType tile, int iNumberOfTraps = BSConstants.NUMBER_OF_TRAPS_PER_RECTANGLE)
     {
         Debug.Log("FillMatrixRectangle()");
 
@@ -66,9 +67,9 @@ public class TerrainGen : MonoBehaviour {
         {
             vTraps[i] = new Vector2(Random.Range(iXStart, iXStart + X), Random.Range(iZStart, iZStart + Z));
         }*/
-        for (int x = iXStart; x < (iXStart + X) && x < iMatrixTerrain.GetLength(0); x++)
+        for (int x = iXStart; x < (iXStart + XSize) && x < iMatrixTerrain.GetLength(0); x++)
         {
-            for (int z = iZStart; z < (iZStart + Z) && z < iMatrixTerrain.GetLength(2); z++)
+            for (int z = iZStart; z < (iZStart + ZSize) && z < iMatrixTerrain.GetLength(2); z++)
             {
           /*      for (int i = 0; i < iNumberOfTraps; i++)
                 {
@@ -109,11 +110,7 @@ public class TerrainGen : MonoBehaviour {
             {
                 for (int z = 0; z < iMatrixTerrain.GetLength(2); z++)
                 {
-                    if (iMatrixTerrain[x,y,z] == (int)BSEnums.TileType.CENTER)
-                    {
-                       // Instantiate(prefabCenterTile, new Vector3(x, y - BSConstants.Y_SIZE, z), prefabTile.transform.rotation);
-                    }
-                    else if (iMatrixTerrain[x, y, z] == (int)BSEnums.TileType.ROTATING)
+                    if (iMatrixTerrain[x, y, z] == (int)BSEnums.TileType.ROTATING)
                     {
                         goMatrixTerrain[x, y, z] = Instantiate(prefabTile, new Vector3(x, y - BSConstants.Y_SIZE, z), prefabTile.transform.rotation) as GameObject;
                         goMatrixTerrain[x, y, z].GetComponent<Tile>().SetRotationSpeed(BSConstants.ROTATION_SPEED);
@@ -128,7 +125,7 @@ public class TerrainGen : MonoBehaviour {
                     }
                     else if (iMatrixTerrain[x, y, z] == (int)BSEnums.TileType.ENTRANCE || iMatrixTerrain[x, y, z] == (int)BSEnums.TileType.EXIT)
                     {
-                        goMatrixTerrain[x, y, z] = Instantiate(prefabTileFixed, new Vector3(x, y - BSConstants.Y_SIZE, z), prefabTile.transform.rotation);
+                        goMatrixTerrain[x, y, z] = Instantiate(prefabEntrance, new Vector3(x, y - BSConstants.Y_SIZE, z), prefabTile.transform.rotation);
                         if (iMatrixTerrain[x, y, z] == (int)BSEnums.TileType.ENTRANCE)
                         {
                             v3EntrancePosition = new Vector3(x, y, z);
@@ -148,29 +145,28 @@ public class TerrainGen : MonoBehaviour {
 
     }
 
-    public bool ShouldEnemyMove(Vector3 position)
-    {
-        return ShouldEnemyMoveTo(position, BSEnums.TileType.ROTATING);
-    }
-
-    public bool ShouldEnemyMoveInverse(Vector3 position)
-    {
-        return ShouldEnemyMoveTo(position, BSEnums.TileType.INVERSE_ROTATING);
-    }
-
-    public bool ShouldEnemyMoveTo(Vector3 position, BSEnums.TileType tile)
-    {
-        if (goMatrixTerrain[(int)position.x, BSConstants.Y_SIZE - 1, (int)position.z] != null && goMatrixTerrain[(int)position.x, BSConstants.Y_SIZE - 1, (int)position.z].GetComponent<Tile>() != null)
-        {
-            return (goMatrixTerrain[(int)position.x, BSConstants.Y_SIZE - 1, (int)position.z].GetComponent<Tile>().GetTileType() == tile);
-        }
-        return false;
-    }
-
     public GameObject GetTile(Vector3 v3HeroPosition)
     {
         //Debug.Log("GetTile on position: " +v3HeroPosition);
         return goMatrixTerrain[(int)v3HeroPosition.x, (int)v3HeroPosition.y, (int)v3HeroPosition.z];
+    }
+
+    private void ReadString()
+    {
+        string path = "Assets/Resources/Levels.txt";
+
+        //Read the text from directly from the test.txt file
+        StreamReader reader = new StreamReader(path);
+        Debug.Log("Levels: " + reader.ReadToEnd());
+        reader.Close();
+    }
+
+    private void GenerateLevel()
+    {
+        //pick 3 to 5 random blocks
+
+        //pick the first block and choose a random side (0,3), stick a new block to a random number of tile on that side
+        //Repeat the same process on for each of the random blocks the newest added block (be aware of transpassing over the previos block)
     }
 }
 

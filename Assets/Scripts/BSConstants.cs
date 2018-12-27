@@ -3,12 +3,13 @@
 public static class BSConstants {
     public const int CENTER_DIM = 3;
 
-    public const int X_SIZE = 30;
-    public const int Z_SIZE = 30;
+    public const int X_SIZE = 15;
+    public const int Z_SIZE = 15;
     public const int Y_SIZE = 1;
 
     public const int ENEMY_Y_SPAWN = 0;
     public const string TAG_TRAP = "TRAP";
+    public const string TAG_LEVEL_EDITOR = "LevelEditor";
     public const string TAG_ENEMY = "Enemy";
     public const string TAG_WATER = "WATER";
     public const string TAG_CENTER_TILE = "CENTER_TILE";

@@ -30,16 +30,16 @@ public class Hero : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+    {
         InputController();
-
     }
 
     private void InputController()
     {
         if (v3MatrixPosition == terrainGen.v3ExitPosition)
         {
-            SceneManager.LoadScene("Main");
+            WonLevel();
         }
 
         if (iMana > BSConstants.SPELL_COST)
@@ -98,6 +98,7 @@ public class Hero : MonoBehaviour {
     public void SwapTile()
     {
         BSEnums.SwipeDirection swipeDir = BSEnums.SwipeDirection.BACK;
+
         if (v3FacingDirection == Vector3.forward)
         {
             swipeDir = BSEnums.SwipeDirection.FORWARD;
@@ -110,6 +111,7 @@ public class Hero : MonoBehaviour {
         {
             swipeDir = BSEnums.SwipeDirection.LEFT;
         }
+
         terrainGen.GetTile(v3MatrixPosition + v3FacingDirection).GetComponentInChildren<Tile>().GetNextMovement(swipeDir);
 
     }
@@ -140,7 +142,26 @@ public class Hero : MonoBehaviour {
     {
         if (col.gameObject.tag.Equals(BSConstants.TAG_ENEMY))
         {
-            SceneManager.LoadScene("Main");
+            Die();
         }
+    }
+
+    void OnCollisionEnter(Collision col)
+    {
+        if (col.gameObject.tag.Equals(BSConstants.TAG_TILE) && terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().GetTileType().Equals(BSEnums.TileType.TRAP))
+        {
+            Die();
+        }
+    }
+
+    public void Die()
+    {
+        SceneManager.LoadScene("Main");
+
+    }
+
+    public void WonLevel()
+    {
+        SceneManager.LoadScene("Main");
     }
 }
