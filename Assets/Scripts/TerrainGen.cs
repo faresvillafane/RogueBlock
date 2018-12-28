@@ -25,16 +25,22 @@ public class TerrainGen : MonoBehaviour {
 
     public Vector3 v3EntrancePosition, v3ExitPosition;
 
+    public Material trapMaterial, fixedMaterial, rotatingMaterialTop, rotatingMaterialBot;
+    public GameObject prefTrap, prefEnemy, prefEntrance;
+
+
     void Awake ()
     {
         Debug.Log("Start()");
-
+        /*
         goMatrixTerrain = new GameObject[BSConstants.Z_SIZE * 2 + BSConstants.CENTER_DIM,
                                 BSConstants.Y_SIZE,
                                 BSConstants.Z_SIZE * 2 + BSConstants.CENTER_DIM];
         InitMatrix();
         FillIntMatrixShape();
         InstantiateMatrix();
+        */
+        GenerateLevel();
         bFinishInstantiating = true;
         hero = GameObject.FindGameObjectWithTag("Player").GetComponent<Hero>();
     }
@@ -151,22 +157,118 @@ public class TerrainGen : MonoBehaviour {
         return goMatrixTerrain[(int)v3HeroPosition.x, (int)v3HeroPosition.y, (int)v3HeroPosition.z];
     }
 
-    private void ReadString()
+    private string ReadString()
     {
         string path = "Assets/Resources/Levels.txt";
-
+        string sLevels;
         //Read the text from directly from the test.txt file
         StreamReader reader = new StreamReader(path);
-        Debug.Log("Levels: " + reader.ReadToEnd());
+        sLevels = reader.ReadToEnd();
         reader.Close();
+        return sLevels;
     }
-
+    // 2,1|0-0|0-2|#
     private void GenerateLevel()
     {
-        //pick 3 to 5 random blocks
+        string sAllLevels = ReadString();
 
-        //pick the first block and choose a random side (0,3), stick a new block to a random number of tile on that side
-        //Repeat the same process on for each of the random blocks the newest added block (be aware of transpassing over the previos block)
+        string[] sLevelsSplited = sAllLevels.Split(BSConstants.LEVEL_LEVEL_SEPARATOR);
+
+        string sLevel = sLevelsSplited[0];
+        string[] sTiles = sLevel.Split(BSConstants.LEVEL_TILE_SEPARATOR);
+
+        //GetSize
+        string[] sSize = sTiles[0].Split(BSConstants.LEVEL_SIZE_SEPARATOR);
+
+        //Tiles between 1- sTiles.length - 2
+
+        for (int i = 0; i < int.Parse(sSize[0]); i++)
+        {
+            for (int j = 0; j < int.Parse(sSize[0]); j++)
+            {
+                GameObject go = Instantiate(prefabTile);
+                go.transform.localPosition = new Vector3(i, 0, j);
+                GameObject goOnTop, goOnBot;
+                MeshRenderer goTopTile = go.GetComponentsInChildren<MeshRenderer>()[0];
+                MeshRenderer goBotTile = go.GetComponentsInChildren<MeshRenderer>()[1];
+                string sTopTileType = sTiles[1 + i * int.Parse(sSize[0]) + j].Split(BSConstants.LEVEL_TILE_UPDOWN_SEPARATOR)[0];
+                string sBotTileType = sTiles[1 + i * int.Parse(sSize[0]) + j].Split(BSConstants.LEVEL_TILE_UPDOWN_SEPARATOR)[1];
+
+                Debug.Log("sTopTileType: " + sTopTileType);
+                Debug.Log("sBotTileType: " + sBotTileType);
+                if (sTopTileType == ((int)BSEnums.TileType.AIR).ToString())
+                {
+                    goTopTile.enabled = false;
+                    goBotTile.enabled = false;
+                }
+                else if (sTopTileType == ((int)BSEnums.TileType.FIXED).ToString())
+                {
+                    goTopTile.material = fixedMaterial;
+
+                }
+                else if (sTopTileType == ((int)BSEnums.TileType.TRAP).ToString())
+                {
+                    goTopTile.material = trapMaterial;
+                    goOnTop = Instantiate(prefTrap, goTopTile.transform);
+                    goOnTop.transform.localScale = BSConstants.V3_SPIKE_SCALE;
+                    goOnTop.transform.localPosition = BSConstants.V3_SPIKE_POSITION_IN_TILE;
+
+                }
+                else if (sTopTileType == ((int)BSEnums.TileType.ENEMY).ToString())
+                {
+                    goOnTop = Instantiate(prefEnemy, goTopTile.transform);
+                    goTopTile.material = rotatingMaterialTop;
+
+                    goOnTop.transform.localScale = BSConstants.V3_ENEMY_SCALE;
+                    goOnTop.transform.localPosition = BSConstants.V3_ENEMY_POSITION_IN_TILE;
+                }
+                else if (sTopTileType == ((int)BSEnums.TileType.ENTRANCE).ToString()
+                    || sTopTileType == ((int)BSEnums.TileType.EXIT).ToString())
+                {
+                    goOnTop = Instantiate(prefEntrance, goTopTile.transform);
+                    goTopTile.material = rotatingMaterialTop;
+
+                    goOnTop.transform.localScale = BSConstants.V3_ENTRANCE_SCALE;
+                    goOnTop.transform.localPosition = BSConstants.V3_ENTRANCE_POSITION_IN_TILE;
+                }
+                
+                if (sBotTileType == ((int)BSEnums.TileType.AIR).ToString())
+                {
+                    goTopTile.enabled = false;
+                    goBotTile.enabled = false;
+
+                }
+                else if (sBotTileType == ((int)BSEnums.TileType.FIXED).ToString())
+                {
+                    goBotTile.material = fixedMaterial;
+
+                }
+                else if (sBotTileType == ((int)BSEnums.TileType.TRAP).ToString())
+                {
+                    goBotTile.material = trapMaterial;
+                    goOnBot = Instantiate(prefTrap, goBotTile.transform);
+                    goOnBot.transform.localScale = BSConstants.V3_SPIKE_SCALE;
+                    goOnBot.transform.localPosition = BSConstants.V3_SPIKE_POSITION_IN_TILE;
+
+                }
+                else if (sBotTileType == ((int)BSEnums.TileType.ENEMY).ToString())
+                {
+                    goOnBot = Instantiate(prefEnemy, goBotTile.transform);
+                    goBotTile.material = rotatingMaterialBot;
+                    goOnBot.transform.localScale = BSConstants.V3_ENEMY_SCALE;
+                    goOnBot.transform.localPosition = BSConstants.V3_ENEMY_POSITION_IN_TILE;
+                }
+                else if (sBotTileType == ((int)BSEnums.TileType.ENTRANCE).ToString()
+                    || sBotTileType == ((int)BSEnums.TileType.EXIT).ToString())
+                {
+                    goOnBot = Instantiate(prefEntrance, goBotTile.transform);
+                    goBotTile.material = rotatingMaterialBot;
+
+                    goOnBot.transform.localScale = BSConstants.V3_ENTRANCE_SCALE;
+                    goOnBot.transform.localPosition = BSConstants.V3_ENTRANCE_POSITION_IN_TILE;
+                }
+            }
+        }
     }
 }
 

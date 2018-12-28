@@ -15,16 +15,22 @@ public class TileGroupSave : MonoBehaviour
     [ContextMenuItem("ReadLevel", "ReadString")]
     [SerializeField]
     public GameObject prefTile;
+    public GameObject prefTrap, prefEnemy, prefEntrance;
 
     private List<GameObject> goTiles;
 
     private Transform tParent;
+
+    public bool bBoardOnTop = true;
+    private bool bPrevBoardOnTop = true;
 
     void Start ()
     {
         prevV2Size = v2Size;
         goTiles = new List<GameObject>();
         tParent = GameObject.FindGameObjectWithTag(BSConstants.TAG_LEVEL_EDITOR).transform;
+
+
     }
 
     // Update is called once per frame
@@ -33,6 +39,11 @@ public class TileGroupSave : MonoBehaviour
         {
             GenerateTiles();
             prevV2Size = v2Size;
+        }
+        if(bBoardOnTop != bPrevBoardOnTop)
+        {
+            FlipBoard();
+            bPrevBoardOnTop = bBoardOnTop;
         }
 	}
 
@@ -59,18 +70,18 @@ public class TileGroupSave : MonoBehaviour
     }
 
     /* LEVEL SERIALIZED EXAMPLE --> #X,Z|TopTile-BotTile|TopTile-BotTile|TopTile-BotTile|TopTile-BotTile|TopTile-BotTile|#
-     #3,2|0-0|0-1|0-0|....#
+     #10,10|4-0|0-6|0-0|0-0|0-0|0-6|0-0|0-0|0-0|0-0|0-0|0-0|0-0|0-6|0-0|0-0|0-0|0-0|0-0|0-0|0-0|0-2|#
     */
 
     public void SaveSerializedLevel()
     {
-        string sLevel = v2Size.x + "," + v2Size.y + "|";
+        string sLevel = v2Size.x.ToString() + BSConstants.LEVEL_SIZE_SEPARATOR.ToString() + v2Size.y.ToString() + BSConstants.LEVEL_TILE_SEPARATOR.ToString();
         for (int i = 0; i < goTiles.Count; i++)
         {
-            sLevel += (int)goTiles[i].GetComponent<TileEditor>().topTileType + "-" + (int)goTiles[i].GetComponent<TileEditor>().botTileType + "|";
+            sLevel += ((int)goTiles[i].GetComponent<TileEditor>().topTileType).ToString() + BSConstants.LEVEL_TILE_UPDOWN_SEPARATOR + ((int)goTiles[i].GetComponent<TileEditor>().botTileType).ToString() + BSConstants.LEVEL_TILE_SEPARATOR;
         }
 
-        sLevel += "#";
+        sLevel += BSConstants.LEVEL_LEVEL_SEPARATOR;
         WriteString(sLevel);
     }
 
@@ -99,6 +110,15 @@ public class TileGroupSave : MonoBehaviour
         StreamReader reader = new StreamReader(path);
         Debug.Log("Levels: " + reader.ReadToEnd());
         reader.Close();
+    }
+
+    private void FlipBoard()
+    {
+        Debug.Log("Flip Board");
+        for (int i = 0; i < goTiles.Count; i++)
+        {
+            goTiles[i].GetComponent<TileEditor>().bOnTop = bBoardOnTop;
+        }
     }
 
 }

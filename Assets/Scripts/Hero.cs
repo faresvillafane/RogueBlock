@@ -142,16 +142,16 @@ public class Hero : MonoBehaviour {
     {
         if (col.gameObject.tag.Equals(BSConstants.TAG_ENEMY))
         {
-            Die();
+            //Die();
         }
     }
 
     void OnCollisionEnter(Collision col)
     {
-        if (col.gameObject.tag.Equals(BSConstants.TAG_TILE) && terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().GetTileType().Equals(BSEnums.TileType.TRAP))
+        /*if (col.gameObject.tag.Equals(BSConstants.TAG_TILE) && terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().GetTileType().Equals(BSEnums.TileType.TRAP))
         {
             Die();
-        }
+        }*/
     }
 
     public void Die()
@@ -162,6 +162,6 @@ public class Hero : MonoBehaviour {
 
     public void WonLevel()
     {
-        SceneManager.LoadScene("Main");
+        //SceneManager.LoadScene("Main");
     }
 }
