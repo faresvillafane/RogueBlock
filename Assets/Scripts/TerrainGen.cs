@@ -7,9 +7,9 @@ public class TerrainGen : MonoBehaviour {
     public GameObject goTerrainHolder;
 
     //Stores the gameobjects
-    private GameObject[,,] goMatrixTerrain;
+    private GameObject[,] goMatrixTerrain;
     //Stores the types of tiles
-    private int[,,] iMatrixTerrain;
+    private int[,] iMatrixTerrain;
 
     private const int NUMBER_OF_COLUMNS = BSConstants.Z_SIZE;
     private const int NUMBER_OF_ROWS = BSConstants.X_SIZE;
@@ -50,16 +50,12 @@ public class TerrainGen : MonoBehaviour {
         Debug.Log("InitMatrix()");
 
         iMatrixTerrain = new int[BSConstants.X_SIZE,
-                                BSConstants.Y_SIZE,
-                                BSConstants.Z_SIZE];
+                                BSConstants.Y_SIZE];
         for(int i = 0; i < iMatrixTerrain.GetLength(0); i++)
         {
             for (int j = 0; j < iMatrixTerrain.GetLength(1); j++)
             {
-                for (int k = 0; k < iMatrixTerrain.GetLength(2); k++)
-                {
-                    iMatrixTerrain[i, j, k] = (int)BSEnums.TileType.AIR;
-                }
+                iMatrixTerrain[i, j] = (int)BSEnums.TileType.AIR;
             }
         }
     }
@@ -67,23 +63,12 @@ public class TerrainGen : MonoBehaviour {
     {
         Debug.Log("FillMatrixRectangle()");
 
-        /*Vector2[] vTraps = new Vector2[iNumberOfTraps];
-        bool bTrap = false;
-        for(int i = 0; i < iNumberOfTraps; i++)
-        {
-            vTraps[i] = new Vector2(Random.Range(iXStart, iXStart + X), Random.Range(iZStart, iZStart + Z));
-        }*/
+/*
         for (int x = iXStart; x < (iXStart + XSize) && x < iMatrixTerrain.GetLength(0); x++)
         {
             for (int z = iZStart; z < (iZStart + ZSize) && z < iMatrixTerrain.GetLength(2); z++)
             {
-          /*      for (int i = 0; i < iNumberOfTraps; i++)
-                {
-                    if(vTraps[i].x == x && vTraps[i].y == z)
-                    {
-                        bTrap = true;
-                    }
-                }*/
+
                 iMatrixTerrain[x, BSConstants.Y_SIZE - 1, z] = (int)tile;
                 for(int y = 0; y < BSConstants.Y_SIZE - 1; y++)
                 {
@@ -97,7 +82,7 @@ public class TerrainGen : MonoBehaviour {
 
         //Place Exit
         iMatrixTerrain[BSConstants.X_SIZE-1, 0, Random.Range(0, BSConstants.Z_SIZE - 1)] = (int)BSEnums.TileType.EXIT;
-
+        */
     }
 
     private void FillIntMatrixShape()
@@ -109,6 +94,7 @@ public class TerrainGen : MonoBehaviour {
 
     private void InstantiateMatrix()
     {
+        /*
         Debug.Log("InstantiateMatrix()");
         for (int x = 0; x < iMatrixTerrain.GetLength(0); x++)
         {
@@ -143,7 +129,7 @@ public class TerrainGen : MonoBehaviour {
                     }
                 }
             }
-        }
+        }*/
     }
 
     // Update is called once per frame
@@ -151,10 +137,10 @@ public class TerrainGen : MonoBehaviour {
 
     }
 
-    public GameObject GetTile(Vector3 v3HeroPosition)
+    public GameObject GetTile(Vector2 v2HeroPosition)
     {
         //Debug.Log("GetTile on position: " +v3HeroPosition);
-        return goMatrixTerrain[(int)v3HeroPosition.x, (int)v3HeroPosition.y, (int)v3HeroPosition.z];
+        return goMatrixTerrain[(int)v2HeroPosition.x, (int)v2HeroPosition.y];
     }
 
     private string ReadString()
@@ -181,6 +167,8 @@ public class TerrainGen : MonoBehaviour {
         string[] sSize = sTiles[0].Split(BSConstants.LEVEL_SIZE_SEPARATOR);
 
         //Tiles between 1- sTiles.length - 2
+        goMatrixTerrain = new GameObject[int.Parse(sSize[0]),
+                                int.Parse(sSize[1])];
 
         for (int i = 0; i < int.Parse(sSize[0]); i++)
         {
@@ -188,6 +176,8 @@ public class TerrainGen : MonoBehaviour {
             {
                 GameObject go = Instantiate(prefabTile);
                 go.transform.localPosition = new Vector3(i, 0, j);
+
+                goMatrixTerrain[i, j] = go;
                 GameObject goOnTop, goOnBot;
                 MeshRenderer goTopTile = go.GetComponentsInChildren<MeshRenderer>()[0];
                 MeshRenderer goBotTile = go.GetComponentsInChildren<MeshRenderer>()[1];

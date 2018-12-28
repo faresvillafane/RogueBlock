@@ -6,7 +6,6 @@ public class Tile : MonoBehaviour {
     public GameObject goTopTile, goBotTile;
     private BSEnums.TileType tileTopType = BSEnums.TileType.ROTATING;
     private BSEnums.TileType tileBotType = BSEnums.TileType.ROTATING;
-    private BSEnums.TileType prevTileType = BSEnums.TileType.ROTATING;
     private Quaternion targetRotation = Quaternion.Euler(Vector3.zero);
     private float fRotatingSpeed;
 
@@ -46,31 +45,25 @@ public class Tile : MonoBehaviour {
         return targetRotation;
     }
 
-    public BSEnums.TileType GetTileType()
+    public BSEnums.TileType GetTopTileType()
     {
         return tileTopType;
     }
 
-    public void SetTileType(BSEnums.TileType tt)
+    public void SetTopTileType(BSEnums.TileType tt)
     {
         tileTopType = tt;
-        //StartCoroutine(RecoverTileType());
     }
-
-    public void SetTileType(BSEnums.TileType tt, Material newMat)
+    public BSEnums.TileType GetBotTileType()
     {
-        tileTopType = tt;
-        this.GetComponent<Renderer>().sharedMaterial = newMat;
-        StartCoroutine(RecoverTileType());
+        return tileBotType;
     }
 
-    private IEnumerator RecoverTileType()
+    public void SetBotTileType(BSEnums.TileType tt)
     {
-        yield return new WaitForSeconds(BSConstants.RECOVER_TIME_TILE);
-        tileTopType = BSEnums.TileType.ROTATING;
-        this.GetComponent<Renderer>().sharedMaterial = initMaterial;
-
+        tileBotType = tt;
     }
+
 
     void Update()
     {
@@ -84,7 +77,7 @@ public class Tile : MonoBehaviour {
         {
             bFinishedRotating = true;
 
-            if (this.tileTopType == BSEnums.TileType.ROTATING)
+            if (this.tileTopType != BSEnums.TileType.FIXED)
             {
                 bFinishedRotating &= RotateTile();
             }
