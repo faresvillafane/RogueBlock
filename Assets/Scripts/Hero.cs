@@ -24,9 +24,16 @@ public class Hero : MonoBehaviour {
     void Start ()
     {
         terrainGen = GameObject.FindGameObjectWithTag(BSConstants.TAG_GAME_CONTROLLER).GetComponent<TerrainGen>();
-        v3MatrixPosition = transform.position = terrainGen.v3EntrancePosition;
+        v3MatrixPosition = transform.position = new Vector3(terrainGen.v2EntrancePosition.x,0,terrainGen.v2EntrancePosition.y);
 
         transform.position = new Vector3(transform.position.x, BSConstants.POSITION_OVER_SCENARIO_Y, transform.position.z);
+
+        v3FacingDirection = Vector3.right;
+        Vector3 v3Rot;
+        v3Rot = new Vector3(0, 180, 0);
+        transform.rotation = Quaternion.Euler(v3Rot);
+
+        transform.SetParent(terrainGen.GetTile(WorldPosToMatrix(v3MatrixPosition)).GetComponentInChildren<Tile>().goTopTile.transform);
     }
 	
 	// Update is called once per frame
@@ -37,9 +44,17 @@ public class Hero : MonoBehaviour {
 
     private void InputController()
     {
-        if (v3MatrixPosition == terrainGen.v3ExitPosition)
+        if ((WorldPosToMatrix(v3MatrixPosition) == terrainGen.v2ExitPositionTop &&
+            terrainGen.GetTile(terrainGen.v2ExitPositionTop).GetComponent<Tile>().bOnTop == bOnTop) 
+            || (WorldPosToMatrix(v3MatrixPosition) == terrainGen.v2ExitPositionBot &&
+            terrainGen.GetTile(terrainGen.v2ExitPositionBot).GetComponent<Tile>().bOnTop != bOnTop)
+            )
         {
             WonLevel();
+        }
+        else if (terrainGen.GetTile(WorldPosToMatrix(v3MatrixPosition)).GetComponent<Tile>().GetTileTypeFrom(bOnTop) == BSEnums.TileType.TRAP)
+        {
+            Die();
         }
 
         if (iMana > BSConstants.SPELL_COST)
@@ -75,15 +90,16 @@ public class Hero : MonoBehaviour {
                 {
                     MoveInDirection(Vector3.left);
                 }
-                transform.SetParent(terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().goTopTile.transform);
             }
         }
     }
 
     public void MoveInDirection(Vector3 v3MoveKey)
     {
+        //Controlar bordes, y vacios
+        Vector3 v3ResultPosition = v3MatrixPosition + v3MoveKey;
         transform.SetParent(null);
-        if (v3FacingDirection == v3MoveKey && terrainGen.GetTile(v3MatrixPosition + v3MoveKey).GetComponentInChildren<Tile>().bFinishedRotating)
+        if (v3FacingDirection == v3MoveKey && IsValidPosition(v3ResultPosition) && terrainGen.GetTile(WorldPosToMatrix(v3ResultPosition)).GetComponentInChildren<Tile>().bFinishedRotating)
         {
             transform.position += v3MoveKey;
             v3MatrixPosition += v3MoveKey;
@@ -91,9 +107,67 @@ public class Hero : MonoBehaviour {
         else
         {
             v3FacingDirection = v3MoveKey;
+            Vector3 v3Rot;
+            if(v3FacingDirection == Vector3.right)
+            {
+                v3Rot = new Vector3(0, 180, 0);
+            }
+            else if(v3FacingDirection == Vector3.left)
+            {
+                v3Rot = new Vector3(0, 0, 0);
+
+            }
+            else if(v3FacingDirection == Vector3.back)
+            {
+                v3Rot = new Vector3(0, 270, 0);
+            }
+            else
+            {
+                v3Rot = new Vector3(0, 90, 0);
+            }
+            transform.rotation = Quaternion.Euler(v3Rot);
         }
+        if (bOnTop)
+        {
+            if (terrainGen.GetTile(WorldPosToMatrix(v3MatrixPosition)).GetComponentInChildren<Tile>().bOnTop)
+            {
+                transform.SetParent(terrainGen.GetTile(WorldPosToMatrix(v3MatrixPosition)).GetComponentInChildren<Tile>().goTopTile.transform);
+            }
+            else
+            {
+                transform.SetParent(terrainGen.GetTile(WorldPosToMatrix(v3MatrixPosition)).GetComponentInChildren<Tile>().goBotTile.transform);
+
+            }
+        }
+        else
+        {
+            if (terrainGen.GetTile(WorldPosToMatrix(v3MatrixPosition)).GetComponentInChildren<Tile>().bOnTop)
+            {
+                transform.SetParent(terrainGen.GetTile(WorldPosToMatrix(v3MatrixPosition)).GetComponentInChildren<Tile>().goBotTile.transform);
+            }
+            else
+            {
+                transform.SetParent(terrainGen.GetTile(WorldPosToMatrix(v3MatrixPosition)).GetComponentInChildren<Tile>().goTopTile.transform);
+
+            }
+        }
+
         fLastTimeMovement = Time.realtimeSinceStartup;
     } 
+
+    public bool IsValidPosition(Vector3 v3PositionToCheck)
+    {
+        return v3PositionToCheck.x >= 0 && v3PositionToCheck.z >= 0
+            && v3PositionToCheck.x < terrainGen.v2TileSize.x && v3PositionToCheck.z < terrainGen.v2TileSize.y
+            && terrainGen.GetTile(WorldPosToMatrix(v3PositionToCheck)).GetComponentInChildren<Tile>().GetTileTypeFrom(bOnTop) != BSEnums.TileType.AIR;
+
+
+    }
+
+    public Vector2 WorldPosToMatrix(Vector3 v3Position)
+    {
+        return new Vector2(v3Position.x, v3Position.z);
+    }
 
     public void SwapTile()
     {
@@ -112,7 +186,7 @@ public class Hero : MonoBehaviour {
             swipeDir = BSEnums.SwipeDirection.LEFT;
         }
 
-        terrainGen.GetTile(v3MatrixPosition + v3FacingDirection).GetComponentInChildren<Tile>().GetNextMovement(swipeDir);
+        terrainGen.GetTile(WorldPosToMatrix(v3MatrixPosition + v3FacingDirection)).GetComponentInChildren<Tile>().GetNextMovement(swipeDir);
 
     }
 
@@ -162,6 +236,6 @@ public class Hero : MonoBehaviour {
 
     public void WonLevel()
     {
-        //SceneManager.LoadScene("Main");
+        SceneManager.LoadScene("Main");
     }
 }

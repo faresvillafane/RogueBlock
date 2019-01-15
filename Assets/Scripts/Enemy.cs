@@ -33,13 +33,30 @@ public class Enemy : MonoBehaviour {
             Vector3 v3Nextstep = GetNextStep();
             transform.position += v3Nextstep;
             v3MatrixPosition += v3Nextstep;
+
             if (bOnTop)
             {
-                transform.SetParent(terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().goTopTile.transform);
+                if (terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().bOnTop)
+                {
+                    transform.SetParent(terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().goTopTile.transform);
+                }
+                else
+                {
+                    transform.SetParent(terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().goBotTile.transform);
+
+                }
             }
             else
             {
-                transform.SetParent(terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().goBotTile.transform);
+                if (terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().bOnTop)
+                {
+                    transform.SetParent(terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().goBotTile.transform);
+                }
+                else
+                {
+                    transform.SetParent(terrainGen.GetTile(v3MatrixPosition).GetComponentInChildren<Tile>().goTopTile.transform);
+
+                }
             }
 
         }

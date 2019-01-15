@@ -23,11 +23,13 @@ public class TerrainGen : MonoBehaviour {
     private Hero hero;
     private bool bFinishedRotating = true;
 
-    public Vector3 v3EntrancePosition, v3ExitPosition;
 
     public Material trapMaterial, fixedMaterial, rotatingMaterialTop, rotatingMaterialBot;
     public GameObject prefTrap, prefEnemy, prefEntrance;
 
+    public Vector2 v2TileSize;
+
+    public Vector2 v2EntrancePosition, v2ExitPositionTop, v2ExitPositionBot;
 
     void Awake ()
     {
@@ -137,10 +139,10 @@ public class TerrainGen : MonoBehaviour {
 
     }
 
-    public GameObject GetTile(Vector2 v2HeroPosition)
+    public GameObject GetTile(Vector2 v2Tile)
     {
         //Debug.Log("GetTile on position: " +v3HeroPosition);
-        return goMatrixTerrain[(int)v2HeroPosition.x, (int)v2HeroPosition.y];
+        return goMatrixTerrain[(int)v2Tile.x, (int)v2Tile.y];
     }
 
     private string ReadString()
@@ -170,6 +172,8 @@ public class TerrainGen : MonoBehaviour {
         goMatrixTerrain = new GameObject[int.Parse(sSize[0]),
                                 int.Parse(sSize[1])];
 
+        v2TileSize = new Vector2(int.Parse(sSize[0]),
+                                int.Parse(sSize[1]));
         for (int i = 0; i < int.Parse(sSize[0]); i++)
         {
             for (int j = 0; j < int.Parse(sSize[0]); j++)
@@ -184,8 +188,9 @@ public class TerrainGen : MonoBehaviour {
                 string sTopTileType = sTiles[1 + i * int.Parse(sSize[0]) + j].Split(BSConstants.LEVEL_TILE_UPDOWN_SEPARATOR)[0];
                 string sBotTileType = sTiles[1 + i * int.Parse(sSize[0]) + j].Split(BSConstants.LEVEL_TILE_UPDOWN_SEPARATOR)[1];
 
-                Debug.Log("sTopTileType: " + sTopTileType);
-                Debug.Log("sBotTileType: " + sBotTileType);
+                go.GetComponentInChildren<Tile>().SetBotTileType((BSEnums.TileType)int.Parse(sBotTileType));
+                go.GetComponentInChildren<Tile>().SetTopTileType((BSEnums.TileType)int.Parse(sTopTileType));
+
                 if (sTopTileType == ((int)BSEnums.TileType.AIR).ToString())
                 {
                     goTopTile.enabled = false;
@@ -212,16 +217,27 @@ public class TerrainGen : MonoBehaviour {
                     goOnTop.transform.localScale = BSConstants.V3_ENEMY_SCALE;
                     goOnTop.transform.localPosition = BSConstants.V3_ENEMY_POSITION_IN_TILE;
                 }
-                else if (sTopTileType == ((int)BSEnums.TileType.ENTRANCE).ToString()
-                    || sTopTileType == ((int)BSEnums.TileType.EXIT).ToString())
+                else if (sTopTileType == ((int)BSEnums.TileType.ENTRANCE).ToString())
                 {
                     goOnTop = Instantiate(prefEntrance, goTopTile.transform);
                     goTopTile.material = rotatingMaterialTop;
 
                     goOnTop.transform.localScale = BSConstants.V3_ENTRANCE_SCALE;
                     goOnTop.transform.localPosition = BSConstants.V3_ENTRANCE_POSITION_IN_TILE;
+                    v2EntrancePosition = new Vector2(i, j);
+
                 }
-                
+                else if (sTopTileType == ((int)BSEnums.TileType.EXIT).ToString())
+                {
+                    goOnTop = Instantiate(prefEntrance, goTopTile.transform);
+                    goTopTile.material = rotatingMaterialTop;
+
+                    goOnTop.transform.localScale = BSConstants.V3_ENTRANCE_SCALE;
+                    goOnTop.transform.localPosition = BSConstants.V3_ENTRANCE_POSITION_IN_TILE;
+                    Debug.Log("EXIT: " + i + "," + j);
+                    v2ExitPositionTop = new Vector2(i, j);
+                }
+
                 if (sBotTileType == ((int)BSEnums.TileType.AIR).ToString())
                 {
                     goTopTile.enabled = false;
@@ -248,14 +264,26 @@ public class TerrainGen : MonoBehaviour {
                     goOnBot.transform.localScale = BSConstants.V3_ENEMY_SCALE;
                     goOnBot.transform.localPosition = BSConstants.V3_ENEMY_POSITION_IN_TILE;
                 }
-                else if (sBotTileType == ((int)BSEnums.TileType.ENTRANCE).ToString()
-                    || sBotTileType == ((int)BSEnums.TileType.EXIT).ToString())
+                else if (sBotTileType == ((int)BSEnums.TileType.EXIT).ToString())
                 {
                     goOnBot = Instantiate(prefEntrance, goBotTile.transform);
                     goBotTile.material = rotatingMaterialBot;
 
                     goOnBot.transform.localScale = BSConstants.V3_ENTRANCE_SCALE;
                     goOnBot.transform.localPosition = BSConstants.V3_ENTRANCE_POSITION_IN_TILE;
+                    Debug.Log("EXIT: " + i + "," + j);
+
+                    v2ExitPositionBot = new Vector2(i,j);
+                }
+                else if (sBotTileType == ((int)BSEnums.TileType.ENTRANCE).ToString())
+                {
+                    goOnBot = Instantiate(prefEntrance, goBotTile.transform);
+                    goBotTile.material = rotatingMaterialBot;
+
+                    goOnBot.transform.localScale = BSConstants.V3_ENTRANCE_SCALE;
+                    goOnBot.transform.localPosition = BSConstants.V3_ENTRANCE_POSITION_IN_TILE;
+
+                    v2EntrancePosition = new Vector2(i,j);
                 }
             }
         }

@@ -44,7 +44,7 @@ public static class BSConstants {
     public static readonly UnityEngine.Vector3 OBJECT_OUT_OF_SCREEN = new UnityEngine.Vector3(500, 500, 500);
 
     public const float ROTATION_SPEED = .2f;
-    public const float POSITION_OVER_SCENARIO_Y = -.4f;
+    public const float POSITION_OVER_SCENARIO_Y = .5f;
 
     public static readonly UnityEngine.Vector3 V3_SPIKE_POSITION_IN_TILE = new UnityEngine.Vector3(-.9f, -5, -.25f);
     public static readonly UnityEngine.Vector3 V3_SPIKE_SCALE = new UnityEngine.Vector3(2, 20, 2);

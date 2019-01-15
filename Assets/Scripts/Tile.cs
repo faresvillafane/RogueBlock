@@ -7,11 +7,13 @@ public class Tile : MonoBehaviour {
     private BSEnums.TileType tileTopType = BSEnums.TileType.ROTATING;
     private BSEnums.TileType tileBotType = BSEnums.TileType.ROTATING;
     private Quaternion targetRotation = Quaternion.Euler(Vector3.zero);
-    private float fRotatingSpeed;
+    private float fRotatingSpeed = .25f;
 
     private Material initMaterial;
 
     public bool bFinishedRotating = true;
+
+    public bool bOnTop = true;
 
     private Vector3 v3PositionInMatrix;
 
@@ -22,11 +24,23 @@ public class Tile : MonoBehaviour {
 
     }
 
+    public BSEnums.TileType GetTileTypeFrom(bool bOnTopParam)
+    {
+        BSEnums.TileType bRes;
+        if (bOnTop)
+        {
+            bRes = (bOnTopParam) ? tileTopType : tileBotType;
+        }
+        else
+        {
+            bRes = (bOnTopParam) ? tileBotType : tileTopType;
+        }
+        return bRes;
+    }
     public void SetPositionInMatrix(Vector3 newPosition)
     {
         v3PositionInMatrix = newPosition;
     }
-	
     public void SetRotationSpeed(float fNewSpeed)
     {
         fRotatingSpeed = fNewSpeed;
@@ -39,17 +53,14 @@ public class Tile : MonoBehaviour {
     {
         return fRotatingSpeed;
     }
-
     public Quaternion GetTargetRotation()
     {
         return targetRotation;
     }
-
     public BSEnums.TileType GetTopTileType()
     {
         return tileTopType;
     }
-
     public void SetTopTileType(BSEnums.TileType tt)
     {
         tileTopType = tt;
@@ -58,12 +69,10 @@ public class Tile : MonoBehaviour {
     {
         return tileBotType;
     }
-
     public void SetBotTileType(BSEnums.TileType tt)
     {
         tileBotType = tt;
     }
-
 
     void Update()
     {
@@ -97,6 +106,7 @@ public class Tile : MonoBehaviour {
         {
             transform.rotation = GetTargetRotation();
             Debug.Log("Finish Rotating");
+            bOnTop = !bOnTop;
             return true;
         }
 
@@ -134,8 +144,8 @@ public class Tile : MonoBehaviour {
                 GetComponentInChildren<Hero>().bOnTop = !GetComponentInChildren<Hero>().bOnTop;
             }
             //pregunta al script y no a la matriz por si un enemigo la cambio
-            if (tileTopType == BSEnums.TileType.ROTATING
-                /*|| tileType == BSEnums.TileType.INVERSE_ROTATING*/)
+            /*if (tileTopType == BSEnums.TileType.ROTATING
+                )*/
             {
                 SetTargetRotation(GetTargetRotation() * Quaternion.AngleAxis(179.9f, nextSpinVector));
                 bFinishedRotating = false;
