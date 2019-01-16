@@ -46,6 +46,10 @@ public static class BSConstants {
     public const float ROTATION_SPEED = .2f;
     public const float POSITION_OVER_SCENARIO_Y = .5f;
 
+    public const float MIN_LERP_DISTANCE = .1f;
+
+    
+
     public static readonly UnityEngine.Vector3 V3_SPIKE_POSITION_IN_TILE = new UnityEngine.Vector3(-.9f, -5, -.25f);
     public static readonly UnityEngine.Vector3 V3_SPIKE_SCALE = new UnityEngine.Vector3(2, 20, 2);
 

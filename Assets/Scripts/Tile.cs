@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Tile : MonoBehaviour {
     public GameObject goTopTile, goBotTile;
@@ -17,11 +18,13 @@ public class Tile : MonoBehaviour {
 
     private Vector3 v3PositionInMatrix;
 
+    private TerrainGen terrainGen;
+
     // Use this for initialization
     void Start ()
     {
-       // initMaterial = this.GetComponent<Renderer>().sharedMaterial;
-
+        // initMaterial = this.GetComponent<Renderer>().sharedMaterial;
+        terrainGen = GameObject.FindGameObjectWithTag(BSConstants.TAG_GAME_CONTROLLER).GetComponent<TerrainGen>();
     }
 
     public BSEnums.TileType GetTileTypeFrom(bool bOnTopParam)
@@ -107,9 +110,32 @@ public class Tile : MonoBehaviour {
             transform.rotation = GetTargetRotation();
             Debug.Log("Finish Rotating");
             bOnTop = !bOnTop;
+            if (GetComponentInChildren<Enemy>() != null)
+            {
+                GetComponentInChildren<Enemy>().bOnTop = !GetComponentInChildren<Enemy>().bOnTop;
+            }
+
+            if (GetComponentInChildren<Hero>() != null)
+            {
+                GetComponentInChildren<Hero>().bOnTop = !GetComponentInChildren<Hero>().bOnTop;
+            }
+            CheckWinCondition();
             return true;
         }
 
+    }
+
+    public void CheckWinCondition()
+    {
+        if (terrainGen.AllTilesInverted())
+        {
+            Win();
+        }
+    }
+
+    public void Win()
+    {
+        SceneManager.LoadScene("Main");
     }
 
 
@@ -134,15 +160,7 @@ public class Tile : MonoBehaviour {
                     nextSpinVector = -TurnRight(tile);
                     break;
             }
-            if(GetComponentInChildren<Enemy>() != null)
-            {
-                GetComponentInChildren<Enemy>().bOnTop = !GetComponentInChildren<Enemy>().bOnTop;
-            }
 
-            if (GetComponentInChildren<Hero>() != null)
-            {
-                GetComponentInChildren<Hero>().bOnTop = !GetComponentInChildren<Hero>().bOnTop;
-            }
             //pregunta al script y no a la matriz por si un enemigo la cambio
             /*if (tileTopType == BSEnums.TileType.ROTATING
                 )*/

@@ -161,13 +161,15 @@ public class TerrainGen : MonoBehaviour {
         string sAllLevels = ReadString();
 
         string[] sLevelsSplited = sAllLevels.Split(BSConstants.LEVEL_LEVEL_SEPARATOR);
-
-        string sLevel = sLevelsSplited[0];
+        int iRndLevel = BSUtils.RandInt(0, sLevelsSplited.Length - 2);
+        string sLevel = sLevelsSplited[iRndLevel];
         string[] sTiles = sLevel.Split(BSConstants.LEVEL_TILE_SEPARATOR);
 
         //GetSize
         string[] sSize = sTiles[0].Split(BSConstants.LEVEL_SIZE_SEPARATOR);
 
+        Debug.Log("LEVELIDX : " + iRndLevel  + " |Level length " + sSize.Length);
+        Debug.Log("Level> " + sSize[0] + "-" + sSize[1]);
         //Tiles between 1- sTiles.length - 2
         goMatrixTerrain = new GameObject[int.Parse(sSize[0]),
                                 int.Parse(sSize[1])];
@@ -212,6 +214,7 @@ public class TerrainGen : MonoBehaviour {
                 else if (sTopTileType == ((int)BSEnums.TileType.ENEMY).ToString())
                 {
                     goOnTop = Instantiate(prefEnemy, goTopTile.transform);
+                    goOnTop.GetComponent<Enemy>().InitializeEnemy(true, new Vector3(i,0,j));
                     goTopTile.material = rotatingMaterialTop;
 
                     goOnTop.transform.localScale = BSConstants.V3_ENEMY_SCALE;
@@ -263,6 +266,8 @@ public class TerrainGen : MonoBehaviour {
                     goBotTile.material = rotatingMaterialBot;
                     goOnBot.transform.localScale = BSConstants.V3_ENEMY_SCALE;
                     goOnBot.transform.localPosition = BSConstants.V3_ENEMY_POSITION_IN_TILE;
+                    goOnBot.GetComponent<Enemy>().InitializeEnemy(false, new Vector3(i, 0, j));
+
                 }
                 else if (sBotTileType == ((int)BSEnums.TileType.EXIT).ToString())
                 {
@@ -287,6 +292,26 @@ public class TerrainGen : MonoBehaviour {
                 }
             }
         }
+    }
+
+    //not working
+    public bool AllTilesInverted()
+    {
+        bool bTileInverted = true;
+
+        for (int i = 0; i < goMatrixTerrain.GetLength(0) ; i++)
+        {
+            for (int j = 0; j < goMatrixTerrain.GetLength(1) ; j++)
+            {
+                if(goMatrixTerrain[i, j].GetComponent<Tile>().GetBotTileType() != BSEnums.TileType.AIR &&(
+                    goMatrixTerrain[i, j].GetComponent<Tile>().GetBotTileType() != BSEnums.TileType.FIXED || goMatrixTerrain[i, j].GetComponent<Tile>().GetTopTileType() != BSEnums.TileType.FIXED))
+                {
+                    bTileInverted &= !goMatrixTerrain[i, j].GetComponent<Tile>().bOnTop;
+                }
+            }
+        }
+
+        return bTileInverted;
     }
 }
 
